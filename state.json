@@ -11,7 +11,7 @@
     "date": "2026-08-20"
   },
   "last_Rotation": {
-    "score": 8.25247610095827,
+    "score": 8.296397523918657,
     "val": "Dom. BTC 58.6% \u00b7 ETH/BTC 0.0321",
     "date": "2026-08-20"
   },
@@ -31,5 +31,6 @@
     "date": "2026-08-20"
   },
   "last_band_idx": 0,
-  "last_band": "ACCUMULATION"
+  "last_band": "ACCUMULATION",
+  "ladder_hits": {}
 }
