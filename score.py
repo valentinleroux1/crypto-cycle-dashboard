@@ -11,19 +11,21 @@ Usage:  python score.py [chemin_sortie.html]
 """
 import ssl, json, urllib.request, io, csv, sys, os, datetime
 
-# --- réseau (fallback TLS non vérifié pour environnements à horloge décalée) ---
-def _ctx():
-    c = ssl.create_default_context()
-    try:
-        import certifi  # noqa
-        return c
-    except Exception:
-        c.check_hostname = False
-        c.verify_mode = ssl.CERT_NONE
-        return c
-CTX = _ctx()
-
+# --- réseau : TLS vérifié, avec bascule non vérifié si le certificat paraît
+#     expiré/invalide (robuste aux environnements à horloge décalée). ---
 import time
+def _unverified_ctx():
+    c = ssl.create_default_context()
+    c.check_hostname = False
+    c.verify_mode = ssl.CERT_NONE
+    return c
+
+def _fetch(req, timeout):
+    try:
+        return urllib.request.urlopen(req, timeout=timeout, context=ssl.create_default_context()).read()
+    except ssl.SSLError:
+        return urllib.request.urlopen(req, timeout=timeout, context=_unverified_ctx()).read()
+
 def _open(url, timeout, accept=None, attempts=3):
     h = {"User-Agent": "Mozilla/5.0"}
     if accept:
@@ -32,7 +34,7 @@ def _open(url, timeout, accept=None, attempts=3):
     last = None
     for attempt in range(attempts):
         try:
-            return urllib.request.urlopen(req, timeout=timeout, context=CTX).read()
+            return _fetch(req, timeout)
         except Exception as e:
             last = e
             if attempt < attempts - 1:
