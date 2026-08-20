@@ -49,6 +49,12 @@ GitHub (+ notif de l'appli mobile).
 Rare par nature (signal multi-années) → tu n'es notifié que quand ça compte vraiment.
 Nécessite `issues: write` dans les permissions (déjà dans le workflow) et rien d'autre.
 
+**Deux types d'alertes :**
+1. **Palier du score composite** (ACCUMULATION → … → SOMMET) : le *timing* global.
+2. **Palier de prix du ladder** : dès que BTC/ETH/SOL atteint un niveau de vente du plan de
+   sortie (ex. « BTC a atteint 170 000$ → vendre 30% »). Chaque niveau n'alerte **qu'une fois**
+   (mémorisé dans `state.json → ladder_hits`). Niveaux définis dans `LADDERS` en tête de `score.py`.
+
 ## Lancer en local (optionnel)
 
 ```

@@ -35,16 +35,19 @@ jobs:
           mkdir -p public
           python score.py public/index.html
 
-      - name: Alerte si franchissement de palier
+      - name: Alertes (paliers score + paliers ladder)
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if [ -f alert.json ] && [ "$(jq -r .changed alert.json)" = "true" ]; then
-            jq -r .body alert.json > _body.md
-            gh issue create --title "$(jq -r .title alert.json)" --body-file _body.md
-            echo "Alerte : issue créée (email envoyé)."
+          COUNT=$(jq '.alerts | length' alert.json 2>/dev/null || echo 0)
+          if [ "$COUNT" -gt 0 ]; then
+            for i in $(seq 0 $((COUNT-1))); do
+              jq -r ".alerts[$i].body" alert.json > _body.md
+              gh issue create --title "$(jq -r ".alerts[$i].title" alert.json)" --body-file _body.md
+            done
+            echo "$COUNT alerte(s) — issue(s) créée(s), email(s) envoyé(s)."
           else
-            echo "Pas de franchissement de palier."
+            echo "Aucune alerte ce run."
           fi
 
       - name: Persister l'état (state.json)

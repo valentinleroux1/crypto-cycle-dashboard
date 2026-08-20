@@ -9,7 +9,7 @@ décroissants). Réglés pour la fenêtre 2029.
 
 Usage:  python score.py [chemin_sortie.html]
 """
-import ssl, json, urllib.request, io, csv, sys, os, datetime
+import ssl, json, urllib.request, urllib.error, io, csv, sys, os, datetime
 
 # --- réseau : TLS vérifié, avec bascule non vérifié si le certificat paraît
 #     expiré/invalide (robuste aux environnements à horloge décalée). ---
@@ -23,8 +23,13 @@ def _unverified_ctx():
 def _fetch(req, timeout):
     try:
         return urllib.request.urlopen(req, timeout=timeout, context=ssl.create_default_context()).read()
-    except ssl.SSLError:
-        return urllib.request.urlopen(req, timeout=timeout, context=_unverified_ctx()).read()
+    except (ssl.SSLError, urllib.error.URLError) as e:
+        # l'erreur SSL de urllib est souvent emballée dans URLError -> on inspecte la cause
+        reason = getattr(e, "reason", None)
+        blob = str(reason if reason is not None else e).upper()
+        if isinstance(e, ssl.SSLError) or isinstance(reason, ssl.SSLError) or "CERTIFICATE" in blob or "SSL" in blob:
+            return urllib.request.urlopen(req, timeout=timeout, context=_unverified_ctx()).read()
+        raise
 
 def _open(url, timeout, accept=None, attempts=3):
     h = {"User-Agent": "Mozilla/5.0"}
@@ -204,16 +209,49 @@ arrow = "↑" if (prev_idx is not None and cur_idx > prev_idx) else "↓"
 state["last_band_idx"] = cur_idx
 state["last_band"] = PALIERS[cur_idx]
 
-alert = {"changed": bool(changed)}
+alerts = []
 if changed:
     lines = [f"**Palier franchi : {PALIERS[cur_idx]}** — score **{composite}/100** ({arrow} depuis {PALIERS[prev_idx]}).",
              "", f"**Action : {ACTIONS[cur_idx]}**", "", "| Signal | Valeur | Sous-score |", "|---|---|---|"]
     lines += [f"| {r['name']} | {r['val']} | {r['score']:.0f} |" for r in results]
     lines += ["", "_Alerte automatique — dashboard sommet de cycle 2029._"]
-    alert["title"] = f"[Cycle 2029] Palier {arrow} : {PALIERS[cur_idx]} (score {composite}/100)"
-    alert["body"] = "\n".join(lines)
+    alerts.append({"title": f"[Cycle 2029] Palier {arrow} : {PALIERS[cur_idx]} (score {composite}/100)",
+                   "body": "\n".join(lines)})
+
+# --- alertes LADDER : franchissement d'un palier de PRIX (niveau de vente) ---
+# Paliers alignés sur le plan de sortie 2029. (level $, % à vendre, % cumulé)
+LADDERS = {
+    "BTC": ("bitcoin",  [(140000, "15%", "15%"), (155000, "25%", "40%"), (170000, "30%", "70%"), (182000, "20%", "90%"), (192000, "10%", "100%")]),
+    "ETH": ("ethereum", [(4000, "20%", "20%"), (4800, "25%", "45%"), (5600, "25%", "70%"), (6800, "18%", "88%"), (8000, "12%", "100%")]),
+    "SOL": ("solana",   [(300, "20%", "20%"), (360, "30%", "50%"), (420, "25%", "75%"), (490, "17%", "92%"), (580, "8%", "100%")]),
+}
+try:
+    _ids = ",".join(v[0] for v in LADDERS.values())
+    _px = get_json(f"https://api.coingecko.com/api/v3/simple/price?ids={_ids}&vs_currencies=usd")
+except Exception:
+    _px = {}
+hits = state.setdefault("ladder_hits", {})   # "BTC@140000": true  -> déjà alerté
+ladder_now = {}
+for asset, (cgid, rungs) in LADDERS.items():
+    price = _px.get(cgid, {}).get("usd")
+    if price is None:
+        continue
+    ladder_now[asset] = price
+    for level, pct, cum in rungs:
+        key = f"{asset}@{level}"
+        if price >= level and not hits.get(key):
+            hits[key] = True
+            lvl = f"{level:,}".replace(",", " ")
+            prc = f"{price:,.0f}".replace(",", " ")
+            alerts.append({
+                "title": f"[Ladder] {asset} a atteint {lvl}$ — vendre {pct} (cumul {cum})",
+                "body": (f"**{asset} = {prc}$** a atteint le palier de vente **{lvl}$**.\n\n"
+                         f"**Action : vendre {pct} de ta ligne {asset}** — cumul **{cum}** sécurisé.\n\n"
+                         f"_Alerte automatique — ladder de sortie 2029._"),
+            })
+
 with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "alert.json"), "w", encoding="utf-8") as f:
-    json.dump(alert, f, ensure_ascii=False, indent=2)
+    json.dump({"alerts": alerts}, f, ensure_ascii=False, indent=2)
 
 cards = ""
 for r in results:
@@ -247,5 +285,9 @@ for r in results:
     print(f"  {r['name']:<18} {r['score']:5.1f}  x{r['w']:.2f}   {r['val']}{flag}")
 if notes:
     print("Signaux en fallback :", notes)
-print(f"Palier : {PALIERS[cur_idx]}" + (f"  <<< FRANCHISSEMENT {arrow} (alerte)" if changed else "  (inchangé)"))
+print(f"Palier score : {PALIERS[cur_idx]}" + (f"  <<< FRANCHISSEMENT {arrow}" if changed else "  (inchangé)"))
+if ladder_now:
+    print("Prix vs 1er palier ladder :", ", ".join(
+        f"{a} {p:,.0f}$/{LADDERS[a][1][0][0]:,}$" for a, p in ladder_now.items()))
+print(f"Alertes générées ce run : {len(alerts)}")
 print("HTML écrit :", out)
