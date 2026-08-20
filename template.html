@@ -1,0 +1,138 @@
+<title>Dashboard Sommet de Cycle</title>
+<style>
+  :root {
+    --bg:#f4f5f7; --surface:#ffffff; --surface-2:#eef0f3;
+    --ink:#191d26; --ink-soft:#545c6b; --ink-faint:#8b94a3;
+    --border:#e1e4ea; --border-2:#d4d8e0;
+    --accent:#a8712a; --accent-2:#8a5d1f;
+    --ok:#3c8564; --watch:#2f7d8a; --warn:#c08a2e; --alert:#c9662e; --crit:#c23b3b;
+    --shadow:0 1px 2px rgba(20,25,35,.05), 0 8px 28px rgba(20,25,35,.06);
+    --font-display:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --font-body:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,sans-serif;
+    --font-mono:ui-monospace,"SF Mono","Cascadia Code","Segoe UI Mono",Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#111419; --surface:#181c23; --surface-2:#1f242d;
+      --ink:#e9ebf0; --ink-soft:#a3abba; --ink-faint:#6d7686;
+      --border:#282e39; --border-2:#333a47;
+      --accent:#d29a4c; --accent-2:#e0aa5f;
+      --ok:#4fa47c; --watch:#3e9aa8; --warn:#d6a04a; --alert:#dd7d47; --crit:#d95757;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#111419; --surface:#181c23; --surface-2:#1f242d;
+    --ink:#e9ebf0; --ink-soft:#a3abba; --ink-faint:#6d7686;
+    --border:#282e39; --border-2:#333a47;
+    --accent:#d29a4c; --accent-2:#e0aa5f;
+    --ok:#4fa47c; --watch:#3e9aa8; --warn:#d6a04a; --alert:#dd7d47; --crit:#d95757;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box;}
+  .page{background:var(--bg); color:var(--ink); font-family:var(--font-body); line-height:1.6;
+    -webkit-font-smoothing:antialiased; padding:clamp(1.1rem,4vw,3rem) 1.1rem 4rem;}
+  .wrap{max-width:64rem; margin:0 auto;}
+  .eyebrow{font-family:var(--font-mono); font-size:.72rem; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--accent); margin:0 0 .8rem; display:flex; gap:.6rem; align-items:center;}
+  .eyebrow::after{content:""; flex:1; height:1px; background:var(--border-2);}
+  h1{font-family:var(--font-display); font-weight:600; font-size:clamp(1.8rem,4.5vw,2.7rem);
+    line-height:1.1; letter-spacing:-.01em; margin:0 0 .5rem; text-wrap:balance;}
+  .sub{color:var(--ink-soft); margin:0 0 1.8rem; max-width:44rem;}
+  .hero{background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    padding:1.6rem 1.6rem 1.4rem; box-shadow:var(--shadow); margin:0 0 1.4rem;}
+  .hero-top{display:flex; flex-wrap:wrap; align-items:baseline; gap:.6rem 1.2rem; margin-bottom:1.2rem;}
+  .score{font-family:var(--font-mono); font-size:clamp(3rem,9vw,4.6rem); font-weight:700;
+    line-height:1; letter-spacing:-.02em; color:__VCOL__; font-variant-numeric:tabular-nums;}
+  .score .max{font-size:1.4rem; color:var(--ink-faint); font-weight:500;}
+  .verdict{display:flex; flex-direction:column; gap:.15rem;}
+  .verdict .lab{font-family:var(--font-mono); font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-faint);}
+  .verdict .val{font-family:var(--font-display); font-size:1.5rem; font-weight:600; color:__VCOL__;}
+  .verdict .note{font-size:.9rem; color:var(--ink-soft);}
+  .meter{position:relative; height:2.2rem; border-radius:7px; overflow:hidden; display:flex; border:1px solid var(--border-2);}
+  .meter .z{flex:0 0 auto; height:100%; opacity:.85;}
+  .meter .z1{width:30%; background:var(--ok);}
+  .meter .z2{width:20%; background:var(--watch);}
+  .meter .z3{width:20%; background:var(--warn);}
+  .meter .z4{width:15%; background:var(--alert);}
+  .meter .z5{width:15%; background:var(--crit);}
+  .marker{position:absolute; top:-4px; bottom:-4px; width:3px; background:var(--ink);
+    box-shadow:0 0 0 2px var(--surface); border-radius:2px; z-index:3;}
+  .marker::after{content:attr(data-v); position:absolute; top:-1.35rem; left:50%; transform:translateX(-50%);
+    font-family:var(--font-mono); font-size:.7rem; font-weight:700; color:var(--ink); white-space:nowrap;}
+  .mscale{display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:.66rem;
+    color:var(--ink-faint); margin-top:.9rem;}
+  .mscale span{flex:1; text-align:center;}
+  .mscale span:first-child{text-align:left;} .mscale span:last-child{text-align:right;}
+  h2{font-family:var(--font-display); font-weight:600; font-size:1.3rem; letter-spacing:-.01em; margin:2.2rem 0 1rem;}
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(15.5rem,1fr)); gap:.9rem;}
+  .card{background:var(--surface); border:1px solid var(--border); border-radius:11px;
+    padding:1rem 1.1rem 1.05rem; box-shadow:var(--shadow); border-left:3px solid var(--s);}
+  .card .chead{display:flex; justify-content:space-between; align-items:flex-start; gap:.6rem; margin-bottom:.55rem;}
+  .card .nm{font-weight:650; font-size:.98rem;}
+  .card .q{font-size:.74rem; color:var(--ink-faint); margin-top:.05rem;}
+  .pill{font-family:var(--font-mono); font-size:.64rem; font-weight:700; letter-spacing:.05em;
+    text-transform:uppercase; padding:.2rem .45rem; border-radius:5px; white-space:nowrap;
+    color:var(--s); background:color-mix(in srgb, var(--s) 15%, transparent);}
+  .card .val{font-family:var(--font-mono); font-size:.86rem; color:var(--ink-soft); margin-bottom:.7rem; font-variant-numeric:tabular-nums;}
+  .card .val b{color:var(--ink);}
+  .sbar{height:.5rem; background:var(--surface-2); border-radius:4px; overflow:hidden; margin-bottom:.4rem;}
+  .sbar .f{height:100%; background:var(--s); border-radius:4px;}
+  .card .foot{display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:.7rem; color:var(--ink-faint);}
+  .card .foot b{color:var(--ink-soft);}
+  .legend{background:var(--surface); border:1px solid var(--border); border-radius:11px; padding:1.1rem 1.2rem; box-shadow:var(--shadow);}
+  .lrow{display:grid; grid-template-columns:4.5rem 1fr; gap:.9rem; align-items:baseline; padding:.5rem 0; border-bottom:1px solid var(--border);}
+  .lrow:last-child{border-bottom:none;}
+  .lrow .rng{font-family:var(--font-mono); font-weight:700; font-size:.82rem;}
+  .lrow .act{font-size:.9rem;} .lrow .act b{font-weight:650;}
+  .dot{display:inline-block; width:.6rem; height:.6rem; border-radius:50%; margin-right:.4rem;}
+  .foot-note{margin-top:2rem; padding-top:1.2rem; border-top:1px solid var(--border); font-size:.82rem; color:var(--ink-faint); max-width:44rem;}
+  .foot-note b{color:var(--ink-soft);}
+  .updated{font-family:var(--font-mono); font-size:.76rem; color:var(--ink-faint); margin-top:.4rem;}
+  @media (max-width:520px){ .hero-top{flex-direction:column; gap:.4rem;} }
+</style>
+
+<div class="page">
+<div class="wrap">
+
+  <p class="eyebrow">Indicateur composite · pré-sortie 2029</p>
+  <h1>Dashboard — sommet de cycle</h1>
+  <p class="sub">Score pondéré 0-100 de <em>risque de sommet</em>, agrégeant 6 signaux indépendants à seuils adaptatifs. Il ne prédit pas le jour — il dit dans quelle <em>zone</em> on est, et pilote l'accélération des ladders.</p>
+
+  <div class="hero">
+    <div class="hero-top">
+      <div class="score">__SCORE__<span class="max">/100</span></div>
+      <div class="verdict">
+        <span class="lab">Verdict du jour</span>
+        <span class="val">__VLAB__</span>
+        <span class="note">__VNOTE__</span>
+      </div>
+    </div>
+    <div class="meter">
+      <div class="z z1"></div><div class="z z2"></div><div class="z z3"></div><div class="z z4"></div><div class="z z5"></div>
+      <div class="marker" data-v="__MARKER__" style="left:__MARKER__%"></div>
+    </div>
+    <div class="mscale"><span>0 · Accumulation</span><span>50 · Vigilance</span><span>100 · Sommet</span></div>
+  </div>
+
+  <h2>Les 6 signaux</h2>
+  <div class="grid">
+__CARDS__  </div>
+
+  <h2>Score → action sur les ladders</h2>
+  <div class="legend">
+    <div class="lrow"><span class="rng"><span class="dot" style="background:var(--ok)"></span>0–30</span><span class="act"><b>Accumulation.</b> Rien côté vente.</span></div>
+    <div class="lrow"><span class="rng"><span class="dot" style="background:var(--watch)"></span>30–50</span><span class="act"><b>Mi-cycle.</b> Surveiller, poser les alertes.</span></div>
+    <div class="lrow"><span class="rng"><span class="dot" style="background:var(--warn)"></span>50–70</span><span class="act"><b>Vigilance.</b> Armer les ordres limites, déclencher le bas des ladders.</span></div>
+    <div class="lrow"><span class="rng"><span class="dot" style="background:var(--alert)"></span>70–85</span><span class="act"><b>Distribution.</b> Accélérer les ladders — on vend dans la force.</span></div>
+    <div class="lrow"><span class="rng"><span class="dot" style="background:var(--crit)"></span>85–100</span><span class="act"><b>Sommet probable.</b> Backstop temporel : vendre le reste au marché.</span></div>
+  </div>
+
+  <p class="foot-note">
+    <b>Méthode.</b> Score = Σ (sous-score normalisé × poids). Seuils <b>adaptatifs</b> intégrant les rendements décroissants (ex. MVRV Z de sommet supposé ~5 en 2029). Données scrapées gratuitement (Binance, CoinGecko, bitcoin-data.com, alternative.me, FRED) ; un signal indisponible retombe sur sa dernière valeur connue.<br><br>
+    <b>Règle d'or&nbsp;:</b> jamais sur un seul signal — on agit sur la <b>confluence</b>. Outil d'aide à la décision, pas un oracle (souviens-toi du S2F).
+    <span class="updated">Recalculé automatiquement · dernière mise à jour : __UPDATED__</span>
+  </p>
+
+</div>
+</div>

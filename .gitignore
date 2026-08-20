@@ -1,0 +1,5 @@
+alert.json
+_body.md
+public/
+__pycache__/
+*.pyc

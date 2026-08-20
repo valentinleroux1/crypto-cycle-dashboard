@@ -1,0 +1,63 @@
+name: Dashboard sommet de cycle
+
+on:
+  schedule:
+    - cron: "0 12 * * 1"      # chaque lundi 12:00 UTC
+  workflow_dispatch:           # + bouton "Run workflow" manuel
+
+permissions:
+  contents: write              # committer state.json (persistance du delta ETF)
+  issues: write                # ouvrir une issue = email d'alerte sur franchissement
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install certifi
+
+      - name: Calcul du score composite
+        run: |
+          mkdir -p public
+          python score.py public/index.html
+
+      - name: Alerte si franchissement de palier
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -f alert.json ] && [ "$(jq -r .changed alert.json)" = "true" ]; then
+            jq -r .body alert.json > _body.md
+            gh issue create --title "$(jq -r .title alert.json)" --body-file _body.md
+            echo "Alerte : issue créée (email envoyé)."
+          else
+            echo "Pas de franchissement de palier."
+          fi
+
+      - name: Persister l'état (state.json)
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add state.json
+          git commit -m "maj etat $(date -u +%F)" || echo "rien a committer"
+          git push
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+      - id: deploy
+        uses: actions/deploy-pages@v4

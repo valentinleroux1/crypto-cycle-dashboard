@@ -1,0 +1,35 @@
+{
+  "last_Valorisation": {
+    "score": 20.49266666666667,
+    "val": "MVRV Z 0.41 \u00b7 NUPL 0.25",
+    "date": "2026-08-20"
+  },
+  "etf_total": 576505.80565048,
+  "last_Flux ETF": {
+    "score": 50.0,
+    "val": "Total ETF 576,506 BTC \u00b7 accumulation (+0.00%/sem)",
+    "date": "2026-08-20"
+  },
+  "last_Rotation": {
+    "score": 7.851013721093421,
+    "val": "Dom. BTC 58.6% \u00b7 ETH/BTC 0.0319",
+    "date": "2026-08-20"
+  },
+  "last_Pi Cycle Top": {
+    "score": 15.806589632585405,
+    "val": "111DMA / 2\u00d7350DMA = 0.41",
+    "date": "2026-08-20"
+  },
+  "last_Froth": {
+    "score": 33.46153846153846,
+    "val": "Funding 0.010% \u00b7 F&G 62",
+    "date": "2026-08-20"
+  },
+  "last_Liquidit\u00e9 globale": {
+    "score": 20.0,
+    "val": "M2 YoY +5,0% (23,2 T$)",
+    "date": "2026-08-20"
+  },
+  "last_band_idx": 0,
+  "last_band": "ACCUMULATION"
+}
