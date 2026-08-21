@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: "0 12 * * 1"      # chaque lundi 12:00 UTC
   workflow_dispatch:           # + bouton "Run workflow" manuel
+    inputs:
+      test_alert:
+        description: "Créer une alerte de TEST (vérif notifications)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write              # committer state.json (persistance du delta ETF)
@@ -50,6 +55,18 @@ jobs:
           else
             echo "Aucune alerte ce run."
           fi
+
+      - name: Alerte de TEST (sur demande manuelle)
+        if: ${{ inputs.test_alert }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          printf '%s\n' \
+            'Test du systeme alerte, cree par le bot GitHub Actions (exactement comme les vraies alertes de palier).' '' \
+            'Si tu recois cette notification (push mobile + email), la chaine fonctionne de bout en bout. 🎉' '' \
+            'Tu peux refermer cette issue.' > _test_body.md
+          gh issue create --title "[TEST] Verification des notifications" --body-file _test_body.md
+          echo "Issue de test creee."
 
       - name: Persister l'état (state.json)
         run: |
