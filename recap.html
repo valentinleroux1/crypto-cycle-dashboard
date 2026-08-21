@@ -1,0 +1,103 @@
+<title>Récap Cycle Crypto 2029</title>
+<style>
+  :root{
+    --bg:#f4f5f7;--surface:#fff;--surface-2:#eef0f3;--ink:#191d26;--ink-soft:#545c6b;--ink-faint:#8b94a3;
+    --border:#e1e4ea;--border-2:#d4d8e0;--accent:#a8712a;--btc:#bd7a28;--eth:#5f66c4;--sol:#1f978d;--ok:#3c8564;
+    --shadow:0 1px 2px rgba(20,25,35,.05),0 8px 28px rgba(20,25,35,.06);
+    --fd:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --fb:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,sans-serif;
+    --fm:ui-monospace,"SF Mono","Cascadia Code","Segoe UI Mono",Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    --bg:#111419;--surface:#181c23;--surface-2:#1f242d;--ink:#e9ebf0;--ink-soft:#a3abba;--ink-faint:#6d7686;
+    --border:#282e39;--border-2:#333a47;--accent:#d29a4c;--btc:#d69647;--eth:#868ce0;--sol:#2fb3a6;--ok:#4fa47c;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);}}
+  :root[data-theme="dark"]{
+    --bg:#111419;--surface:#181c23;--surface-2:#1f242d;--ink:#e9ebf0;--ink-soft:#a3abba;--ink-faint:#6d7686;
+    --border:#282e39;--border-2:#333a47;--accent:#d29a4c;--btc:#d69647;--eth:#868ce0;--sol:#2fb3a6;--ok:#4fa47c;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);}
+  *{box-sizing:border-box;}
+  .page{background:var(--bg);color:var(--ink);font-family:var(--fb);line-height:1.6;-webkit-font-smoothing:antialiased;padding:clamp(1rem,4vw,2.6rem) 1.05rem 3.5rem;}
+  .wrap{max-width:41rem;margin:0 auto;}
+  .eyebrow{font-family:var(--fm);font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin:0 0 .7rem;display:flex;gap:.55rem;align-items:center;}
+  .eyebrow::after{content:"";flex:1;height:1px;background:var(--border-2);}
+  h1{font-family:var(--fd);font-weight:600;font-size:clamp(1.65rem,6vw,2.4rem);line-height:1.1;letter-spacing:-.01em;margin:0 0 .5rem;text-wrap:balance;}
+  .lede{color:var(--ink-soft);margin:0 0 1.4rem;}
+  .meta{font-family:var(--fm);font-size:.74rem;color:var(--ink-faint);border-top:1px solid var(--border);padding-top:.9rem;margin-bottom:2rem;}
+  h2{font-family:var(--fd);font-weight:600;font-size:1.25rem;letter-spacing:-.01em;margin:2rem 0 .9rem;display:flex;align-items:baseline;gap:.55rem;}
+  h2 .n{font-family:var(--fm);font-size:.72rem;color:var(--accent);font-weight:500;}
+  p{margin:0 0 .8rem;}
+  .links{display:grid;gap:.7rem;}
+  a.tool{display:flex;gap:.85rem;align-items:center;text-decoration:none;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--c);border-radius:11px;padding:.85rem 1rem;box-shadow:var(--shadow);color:inherit;}
+  a.tool .ico{font-size:1.5rem;line-height:1;}
+  a.tool .t{font-weight:650;font-size:.98rem;}
+  a.tool .d{font-size:.8rem;color:var(--ink-soft);}
+  a.tool .go{margin-left:auto;font-family:var(--fm);font-size:.8rem;color:var(--accent);white-space:nowrap;}
+  ul.thesis{list-style:none;padding:0;margin:0;display:grid;gap:.55rem;}
+  ul.thesis li{background:var(--surface-2);border-radius:8px;padding:.6rem .85rem;font-size:.92rem;}
+  ul.thesis b{color:var(--ink);}
+  table{width:100%;border-collapse:collapse;font-size:.9rem;margin:.2rem 0 .5rem;}
+  th,td{text-align:left;padding:.5rem .5rem;border-bottom:1px solid var(--border);}
+  th{font-family:var(--fm);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;}
+  td.tk{font-family:var(--fm);font-weight:700;}
+  td .m{font-family:var(--fm);font-variant-numeric:tabular-nums;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:.95rem 1.1rem;box-shadow:var(--shadow);}
+  .card.ok{border-left:3px solid var(--ok);}
+  .badge{display:inline-block;font-family:var(--fm);font-size:.72rem;font-weight:700;color:var(--ok);background:color-mix(in srgb,var(--ok) 15%,transparent);padding:.15rem .5rem;border-radius:5px;}
+  .todo{display:grid;gap:.6rem;}
+  .todo .it{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:.75rem .95rem;}
+  .todo .it b{font-size:.95rem;}
+  .todo .it span{display:block;font-size:.84rem;color:var(--ink-soft);margin-top:.15rem;}
+  .disc{margin-top:2.2rem;padding-top:1rem;border-top:1px solid var(--border);font-size:.78rem;color:var(--ink-faint);}
+</style>
+
+<div class="page"><div class="wrap">
+
+  <p class="eyebrow">Récap de session · privé</p>
+  <h1>Cycle crypto 2029 — tout au même endroit</h1>
+  <p class="lede">Le fil des décisions, les outils, l'état actuel et ce qui reste. Consultable sur tous tes appareils.</p>
+  <p class="meta">Établi le 20 août 2026 · théorie & probabilités, pas un conseil financier</p>
+
+  <h2><span class="n">01</span> Tes 3 outils</h2>
+  <div class="links">
+    <a class="tool" style="--c:var(--btc)" href="https://valentinleroux1.github.io/crypto-cycle-dashboard/plan.html">
+      <span class="ico">📉</span><span><span class="t">Plan de sortie 2029</span><span class="d">Objectifs + les 3 ladders détaillés</span></span><span class="go">ouvrir →</span></a>
+    <a class="tool" style="--c:var(--sol)" href="https://valentinleroux1.github.io/crypto-cycle-dashboard/">
+      <span class="ico">🎯</span><span><span class="t">Dashboard sommet de cycle</span><span class="d">Score composite live · recalcul auto hebdo</span></span><span class="go">ouvrir →</span></a>
+    <a class="tool" style="--c:var(--eth)" href="https://github.com/valentinleroux1/crypto-cycle-dashboard">
+      <span class="ico">⚙️</span><span><span class="t">Code & automatisation</span><span class="d">GitHub Actions + alertes email</span></span><span class="go">ouvrir →</span></a>
+  </div>
+
+  <h2><span class="n">02</span> La thèse en 5 points</h2>
+  <ul class="thesis">
+    <li><b>Rendements décroissants</b> — chaque cycle divise le ROI (17×→3,5×→1,8×→~1,4×). Un x10 sur BTC est fini.</li>
+    <li><b>Décote de consensus</b> — « 200k = le nouveau 100k ». On vend <em>sous</em> le nombre rond magnétique.</li>
+    <li><b>Overhead supply (ETH)</b> — les holders échaudés distribuent tôt ; on ne tient pas dans le FOMO des retardataires.</li>
+    <li><b>Pas d'alt season large</b> — capital concentré sur BTC + leaders (ETH/SOL). La longue traîne est morte.</li>
+    <li><b>Front-load</b> — ~75 % sécurisé avant le milieu de la zone. Vendre trop tôt coûte moins cher que trop tard.</li>
+  </ul>
+
+  <h2><span class="n">03</span> Objectifs & ladders 2029</h2>
+  <table>
+    <tr><th>Actif</th><th>Cible base</th><th>Ladder (repères)</th></tr>
+    <tr><td class="tk" style="color:var(--btc)">BTC</td><td class="m">165–185k</td><td class="m">90 % à 182k · top 192k</td></tr>
+    <tr><td class="tk" style="color:var(--eth)">ETH</td><td class="m">5–7k</td><td class="m">70 % à 5,6k · top 8k</td></tr>
+    <tr><td class="tk" style="color:var(--sol)">SOL</td><td class="m">350–475$</td><td class="m">75 % à 420$ · top 580$</td></tr>
+  </table>
+  <p style="font-size:.82rem;color:var(--ink-soft)">Front-loadés, sans moon bag, reliquat haut conditionnel au régime. Détail complet dans le Plan de sortie.</p>
+
+  <h2><span class="n">04</span> Automatisation & alertes</h2>
+  <div class="card ok">
+    <p style="margin-bottom:.6rem"><span class="badge">Score 25/100 · ACCUMULATION</span> — rien à faire côté vente aujourd'hui.</p>
+    <p style="margin:0;font-size:.9rem;color:var(--ink-soft)">Dashboard recalculé <b>chaque lundi</b> (6 signaux, seuils adaptatifs). <b>2 alertes email</b> : palier du score (timing global) + palier de prix des ladders (déclencheur de vente, 1×/niveau). Tout tourne chez GitHub, indépendant de ton PC.</p>
+  </div>
+
+  <h2><span class="n">05</span> À faire plus tard</h2>
+  <div class="todo">
+    <div class="it"><b>Poser les ordres limites (OKX)</b><span>Quand la zone approche. ⚠️ Prévoir le délai d'unstaking — désengager la tranche à vendre dès que les alertes préviennent (tout est en staking pour l'instant).</span></div>
+    <div class="it"><b>Ladder de re-accumulation 2030-2031</b><span>Le côté achat — redéployer les ventes 2029 dans le creux suivant (Rainbow bandes basses + MVRV bas + flux ETF). À construire en session dédiée.</span></div>
+  </div>
+
+  <p class="disc">Cadre théorique et probabiliste à visée analytique — ce ne sont pas des conseils d'investissement personnalisés. Les fourchettes sont des scénarios, pas des prédictions.</p>
+
+</div></div>

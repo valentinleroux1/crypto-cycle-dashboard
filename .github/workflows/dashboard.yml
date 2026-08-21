@@ -34,6 +34,7 @@ jobs:
         run: |
           mkdir -p public
           python score.py public/index.html
+          cp plan.html recap.html public/ 2>/dev/null || true   # pages statiques (accès mobile)
 
       - name: Alertes (paliers score + paliers ladder)
         env:

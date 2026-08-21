@@ -1,0 +1,333 @@
+<style>
+  :root {
+    --bg:        #f4f5f7;
+    --surface:   #ffffff;
+    --surface-2: #eef0f3;
+    --ink:       #191d26;
+    --ink-soft:  #545c6b;
+    --ink-faint: #8b94a3;
+    --border:    #e1e4ea;
+    --border-2:  #d4d8e0;
+    --accent:    #a8712a;   /* patient value — bronze, not crypto-neon */
+    --accent-2:  #8a5d1f;
+    --btc:  #bd7a28;
+    --eth:  #5f66c4;
+    --sol:  #1f978d;
+    --secured: #3c8564;
+    --shadow: 0 1px 2px rgba(20,25,35,.05), 0 8px 28px rgba(20,25,35,.06);
+    --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --font-body: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Segoe UI Mono", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:        #111419;
+      --surface:   #181c23;
+      --surface-2: #1f242d;
+      --ink:       #e9ebf0;
+      --ink-soft:  #a3abba;
+      --ink-faint: #6d7686;
+      --border:    #282e39;
+      --border-2:  #333a47;
+      --accent:    #d29a4c;
+      --accent-2:  #e0aa5f;
+      --btc:  #d69647;
+      --eth:  #868ce0;
+      --sol:  #2fb3a6;
+      --secured: #4fa47c;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="light"] {
+    --bg:#f4f5f7; --surface:#ffffff; --surface-2:#eef0f3; --ink:#191d26; --ink-soft:#545c6b;
+    --ink-faint:#8b94a3; --border:#e1e4ea; --border-2:#d4d8e0; --accent:#a8712a; --accent-2:#8a5d1f;
+    --btc:#bd7a28; --eth:#5f66c4; --sol:#1f978d; --secured:#3c8564;
+    --shadow:0 1px 2px rgba(20,25,35,.05), 0 8px 28px rgba(20,25,35,.06);
+  }
+  :root[data-theme="dark"] {
+    --bg:#111419; --surface:#181c23; --surface-2:#1f242d; --ink:#e9ebf0; --ink-soft:#a3abba;
+    --ink-faint:#6d7686; --border:#282e39; --border-2:#333a47; --accent:#d29a4c; --accent-2:#e0aa5f;
+    --btc:#d69647; --eth:#868ce0; --sol:#2fb3a6; --secured:#4fa47c;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+  .page {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    padding: clamp(1.1rem, 4vw, 3.5rem) 1.1rem 5rem;
+  }
+  .wrap { max-width: 60rem; margin: 0 auto; }
+  .col { max-width: 42rem; }
+
+  /* ---- header ---- */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: .72rem; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 1rem;
+    display: flex; gap: .6rem; align-items: center;
+  }
+  .eyebrow::after { content:""; flex:1; height:1px; background:var(--border-2); }
+  h1 {
+    font-family: var(--font-display); font-weight: 600;
+    font-size: clamp(1.9rem, 5vw, 3rem); line-height: 1.08;
+    letter-spacing: -.01em; text-wrap: balance; margin: 0 0 1rem;
+  }
+  .lede { font-size: 1.12rem; color: var(--ink-soft); max-width: 40rem; margin: 0 0 1.6rem; }
+  .meta {
+    display: flex; flex-wrap: wrap; gap: .5rem .9rem;
+    font-family: var(--font-mono); font-size: .78rem; color: var(--ink-faint);
+    border-top: 1px solid var(--border); padding-top: 1rem; margin-bottom: 2.8rem;
+  }
+  .meta b { color: var(--ink-soft); font-weight: 600; }
+
+  /* ---- timeline ---- */
+  .timeline {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: .4rem;
+    margin: 0 0 3rem; counter-reset: none;
+  }
+  .tl { position: relative; padding-top: 1.4rem; font-size: .74rem; }
+  .tl::before {
+    content:""; position:absolute; top:.32rem; left:0; right:0; height:2px;
+    background: var(--border-2);
+  }
+  .tl::after {
+    content:""; position:absolute; top:0; left:0; width:.62rem; height:.62rem;
+    border-radius:50%; background: var(--surface); border:2px solid var(--border-2);
+  }
+  .tl.now::after { background: var(--accent); border-color: var(--accent); }
+  .tl.peak::after { background: var(--secured); border-color: var(--secured); }
+  .tl .d { font-family: var(--font-mono); color: var(--ink-faint); display:block; }
+  .tl .l { color: var(--ink-soft); }
+  .tl.now .l, .tl.peak .l { color: var(--ink); font-weight: 600; }
+
+  section { margin: 0 0 3rem; }
+  h2 {
+    font-family: var(--font-display); font-weight: 600;
+    font-size: 1.5rem; letter-spacing: -.01em; margin: 0 0 .3rem;
+    display:flex; align-items:baseline; gap:.7rem;
+  }
+  h2 .n {
+    font-family: var(--font-mono); font-size: .8rem; color: var(--accent);
+    font-weight: 500; letter-spacing: .05em;
+  }
+  .sub { color: var(--ink-soft); margin: 0 0 1.3rem; max-width: 42rem; }
+  p { margin: 0 0 1rem; max-width: 42rem; }
+  strong { color: var(--ink); font-weight: 650; }
+  a { color: var(--accent); }
+
+  .callout {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent); border-radius: 8px;
+    padding: 1rem 1.2rem; margin: 0 0 1.4rem; box-shadow: var(--shadow);
+    max-width: 42rem;
+  }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout .k { font-family: var(--font-mono); font-size:.72rem; letter-spacing:.12em;
+    text-transform:uppercase; color: var(--accent); display:block; margin-bottom:.4rem; }
+
+  /* ---- targets grid ---- */
+  .targets { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem,1fr)); gap: .9rem; margin: 0 0 1rem; }
+  .tcard {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 1.1rem 1.2rem; box-shadow: var(--shadow); border-top: 3px solid var(--a);
+  }
+  .tcard .tick { font-family: var(--font-mono); font-weight: 700; font-size: .95rem; color: var(--a); }
+  .tcard .name { font-size: .78rem; color: var(--ink-faint); margin-bottom: .7rem; }
+  .tcard .big { font-family: var(--font-mono); font-size: 1.35rem; font-weight: 600; letter-spacing:-.01em; font-variant-numeric: tabular-nums; }
+  .tcard .now { font-size: .76rem; color: var(--ink-soft); margin-top: .35rem; font-family: var(--font-mono); }
+  .tcard .now b { color: var(--a); }
+
+  /* ---- ladder ---- */
+  .ladder {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 1.2rem 1.3rem 1.3rem; box-shadow: var(--shadow); margin: 0 0 1.2rem;
+    border-top: 3px solid var(--a);
+  }
+  .ladder h3 {
+    margin: 0 0 .1rem; font-family: var(--font-mono); font-size: .95rem; letter-spacing:.02em;
+    display:flex; align-items:baseline; gap:.6rem; color: var(--a);
+  }
+  .ladder h3 span { color: var(--ink-faint); font-size:.76rem; font-weight:400; }
+  .rungs { display: grid; gap: .5rem; margin-top: 1rem; }
+  .rung { display: grid; grid-template-columns: 4.6rem 3rem 1fr; align-items: center; gap: .8rem; }
+  .rung .px { font-family: var(--font-mono); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .rung .pc { font-family: var(--font-mono); font-size: .82rem; color: var(--ink-soft); text-align:right; }
+  .bar { position: relative; height: 1.55rem; background: var(--surface-2); border-radius: 5px; overflow: hidden; }
+  .bar .fill { position:absolute; inset:0 auto 0 0; background: var(--a); border-radius: 5px; opacity:.9; }
+  .bar .cum {
+    position: absolute; right: .5rem; top: 50%; transform: translateY(-50%);
+    font-family: var(--font-mono); font-size: .74rem; font-weight: 600; color: var(--ink);
+    mix-blend-mode: normal; z-index: 2;
+  }
+  .ladnote { font-size: .82rem; color: var(--ink-soft); margin: .9rem 0 0; border-top:1px solid var(--border); padding-top:.8rem; }
+  .ladnote b { color: var(--a); }
+
+  /* ---- guardrails ---- */
+  .rails { display: grid; gap: .7rem; margin: 0 0 1rem; }
+  .rail { display: grid; grid-template-columns: auto 1fr; gap: .9rem; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 9px; padding: .9rem 1.1rem; }
+  .rail .num { font-family: var(--font-mono); font-size: 1.1rem; font-weight: 700; color: var(--accent); line-height:1.3; }
+  .rail .t { font-weight: 650; margin-bottom: .1rem; }
+  .rail .d { font-size: .9rem; color: var(--ink-soft); }
+
+  .open { display: grid; gap:.7rem; }
+  .qitem { background: var(--surface-2); border-radius: 8px; padding: .9rem 1.1rem; font-size:.95rem; }
+  .qitem .q { font-weight: 650; }
+  .qitem .a { color: var(--ink-soft); font-size:.88rem; }
+
+  .disc {
+    margin-top: 3rem; padding-top: 1.3rem; border-top: 1px solid var(--border);
+    font-size: .82rem; color: var(--ink-faint); max-width: 42rem;
+  }
+  hr.soft { border:none; border-top:1px solid var(--border); margin: 2.4rem 0; }
+  @media (prefers-reduced-motion: no-preference) {
+    .bar .fill { transition: none; }
+  }
+  @media (max-width: 620px) {
+    .timeline { grid-template-columns: 1fr 1fr; }
+    .rung { grid-template-columns: 4rem 2.6rem 1fr; }
+  }
+</style>
+
+<div class="page">
+<div class="wrap">
+
+  <header class="col">
+    <p class="eyebrow">Plan de cycle · document privé</p>
+    <h1>Hauts de cycle 2029 &amp; plan de sortie</h1>
+    <p class="lede">Objectifs théoriques du prochain bull run et ladders de vente pré-engagés — construits à froid, dans le bear, pour ne pas décider dans l'euphorie.</p>
+    <div class="meta">
+      <span><b>Mis à jour&nbsp;:</b> 20 août 2026</span>
+      <span><b>Position cycle&nbsp;:</b> post-pic (oct. 2025), phase de correction</span>
+      <span><b>Pic visé&nbsp;:</b> Q3–Q4 2029</span>
+    </div>
+  </header>
+
+  <div class="timeline col">
+    <div class="tl"><span class="d">Avr. 2024</span><span class="l">Halving</span></div>
+    <div class="tl"><span class="d">Oct. 2025</span><span class="l">Pic — 126k</span></div>
+    <div class="tl now"><span class="d">Fin 2026</span><span class="l">Creux attendu · on est ici</span></div>
+    <div class="tl"><span class="d">Avr. 2028</span><span class="l">Halving</span></div>
+    <div class="tl peak"><span class="d">Q4 2029</span><span class="l">Pic théorique · fenêtre de sortie</span></div>
+  </div>
+
+  <section class="col">
+    <h2><span class="n">01</span> La méthode — la leçon de 2020</h2>
+    <p class="sub">En 2020, le consensus voyait 100k&nbsp;; BTC a topé à 69k. On ne refait pas cette erreur.</p>
+    <p>Les <strong>rendements décroissants</strong> sont une loi mathématique&nbsp;: déplacer un actif de 2&nbsp;000&nbsp;Md$ demande infiniment plus de capital qu'un actif de 20&nbsp;Md$. Le multiple sommet-à-sommet s'effondre chaque cycle&nbsp;: <strong>17× → 3,5× → 1,8× → ~1,3–1,4×</strong> attendu.</p>
+    <div class="callout">
+      <span class="k">Les 3 corrections appliquées</span>
+      <p><strong>Ne pas extrapoler l'ancien multiple</strong> — chaque cycle divise le ROI. <strong>Décoter tout objectif consensuel</strong> — un chiffre rond partagé par tous se fait front-run. <strong>Cycle étiré &amp; aplati</strong> — ETF et institutionnels donnent des creux plus hauts mais des sommets moins explosifs.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="col"><span class="n">02</span> Objectifs théoriques — sommet 2029</h2>
+    <p class="sub col">Fourchettes probabilistes (scénario de base, discipliné), pas des points. Vue volontairement conservatrice.</p>
+    <div class="targets">
+      <div class="tcard" style="--a:var(--btc)">
+        <div class="tick">BTC</div><div class="name">Bitcoin</div>
+        <div class="big">165–185k</div>
+        <div class="now">actuel <b>~64,5k</b> · ~2,8×</div>
+      </div>
+      <div class="tcard" style="--a:var(--eth)">
+        <div class="tick">ETH</div><div class="name">Ethereum</div>
+        <div class="big">5–7k</div>
+        <div class="now">actuel <b>~1,9k</b> · ~3,0×</div>
+      </div>
+      <div class="tcard" style="--a:var(--sol)">
+        <div class="tick">SOL</div><div class="name">Solana</div>
+        <div class="big">350–475$</div>
+        <div class="now">actuel <b>~76$</b> · ~5,5×</div>
+      </div>
+    </div>
+    <p class="col" style="font-size:.86rem;color:var(--ink-soft)">SOL = meilleur ratio risque/récompense, mais atteindre 600$+ suppose que le ratio SOL/BTC se retourne — ce qu'il n'a <em>pas</em> fait au dernier cycle. ETH = pari binaire sur un retournement du ratio ETH/BTC.</p>
+  </section>
+
+  <section>
+    <h2 class="col"><span class="n">03</span> Ladders de sortie — 100&nbsp;%, front-loaded</h2>
+    <p class="sub col">Principe&nbsp;: l'asymétrie des erreurs. Vendre trop tôt = gains laissés (agaçant). Vendre trop tard = capital rendu (grave). Donc <strong>~75&nbsp;% sécurisé avant le milieu de la zone visée</strong>. Aucun moon bag&nbsp;: sur des majors, garder une queue est un pari mal payé.</p>
+
+    <div class="ladder" style="--a:var(--btc)">
+      <h3>BTC <span>· zone 165–185k · ordres limites pré-posés</span></h3>
+      <div class="rungs">
+        <div class="rung"><span class="px">140k</span><span class="pc">15%</span><div class="bar"><div class="fill" style="width:15%"></div><span class="cum" style="color:var(--ink)">15%</span></div></div>
+        <div class="rung"><span class="px">155k</span><span class="pc">25%</span><div class="bar"><div class="fill" style="width:40%"></div><span class="cum">40%</span></div></div>
+        <div class="rung"><span class="px">170k</span><span class="pc">30%</span><div class="bar"><div class="fill" style="width:70%"></div><span class="cum">70%</span></div></div>
+        <div class="rung"><span class="px">182k</span><span class="pc">20%</span><div class="bar"><div class="fill" style="width:90%"></div><span class="cum">90%</span></div></div>
+        <div class="rung"><span class="px">192k</span><span class="pc">10%</span><div class="bar"><div class="fill" style="width:100%"></div><span class="cum">100%</span></div></div>
+      </div>
+      <p class="ladnote"><b>« 200k = le nouveau 100k »</b> — nombre rond de consensus, donc mur/plafond. On vend <em>dans</em> le mur&nbsp;: dernier ordre à ~192k, rien au-dessus.</p>
+    </div>
+
+    <div class="ladder" style="--a:var(--eth)">
+      <h3>ETH <span>· zone 5–7k · distribution précoce (overhead supply)</span></h3>
+      <div class="rungs">
+        <div class="rung"><span class="px">4,0k</span><span class="pc">20%</span><div class="bar"><div class="fill" style="width:20%"></div><span class="cum">20%</span></div></div>
+        <div class="rung"><span class="px">4,8k</span><span class="pc">25%</span><div class="bar"><div class="fill" style="width:45%"></div><span class="cum">45%</span></div></div>
+        <div class="rung"><span class="px">5,6k</span><span class="pc">25%</span><div class="bar"><div class="fill" style="width:70%"></div><span class="cum">70%</span></div></div>
+        <div class="rung"><span class="px">6,8k</span><span class="pc">18%</span><div class="bar"><div class="fill" style="width:88%"></div><span class="cum">88%</span></div></div>
+        <div class="rung"><span class="px">8,0k</span><span class="pc">12%</span><div class="bar"><div class="fill" style="width:100%"></div><span class="cum">100%</span></div></div>
+      </div>
+      <p class="ladnote"><b>70&nbsp;% vendu à 5,6k</b>, dans le mur d'<em>overhead supply</em> où les holders échaudés (2 cycles) sortent enfin. Au-dessus = FOMO de nouveaux arrivants → liquidité de sortie, pas demande réelle. <b>Règle&nbsp;:</b> si ETH/BTC saigne, rotation vers BTC.</p>
+    </div>
+
+    <div class="ladder" style="--a:var(--sol)">
+      <h3>SOL <span>· zone 350–475$ · vendre dans la chair (high-beta)</span></h3>
+      <div class="rungs">
+        <div class="rung"><span class="px">300$</span><span class="pc">20%</span><div class="bar"><div class="fill" style="width:20%"></div><span class="cum">20%</span></div></div>
+        <div class="rung"><span class="px">360$</span><span class="pc">30%</span><div class="bar"><div class="fill" style="width:50%"></div><span class="cum">50%</span></div></div>
+        <div class="rung"><span class="px">420$</span><span class="pc">25%</span><div class="bar"><div class="fill" style="width:75%"></div><span class="cum">75%</span></div></div>
+        <div class="rung"><span class="px">490$</span><span class="pc">17%</span><div class="bar"><div class="fill" style="width:92%"></div><span class="cum">92%</span></div></div>
+        <div class="rung"><span class="px">580$</span><span class="pc">8%</span><div class="bar"><div class="fill" style="width:100%"></div><span class="cum">100%</span></div></div>
+      </div>
+      <p class="ladnote"><b>75&nbsp;% vendu à 420$.</b> SOL a à peine dépassé son ATH au dernier cycle (+13&nbsp;%) et fait des −80&nbsp;% en semaines — on sécurise tôt. Rungs hauts (490-580$) <b>conditionnels</b> au régime (bid ETF SOL / dominance BTC qui craque).</p>
+    </div>
+  </section>
+
+  <section class="col">
+    <h2><span class="n">04</span> Garde-fous</h2>
+    <div class="rails">
+      <div class="rail"><div class="num">↦</div><div><div class="t">Ordres pré-engagés</div><div class="d">Limites de vente posées à froid, exécution automatique. Zéro décision en euphorie.</div></div></div>
+      <div class="rail"><div class="num">⏱</div><div><div class="t">Backstop temporel — Q4 2029</div><div class="d">Si le momentum faiblit sans toucher les paliers hauts, vendre au marché tout le reste, quel que soit le prix. On ne garde jamais un rung haut en espérant.</div></div></div>
+      <div class="rail"><div class="num">⊘</div><div><div class="t">Pas de moon bag sur les majors</div><div class="d">Garder une queue « au cas où » n'a de sens que sur un smallcap loterie. Sur BTC/ETH/SOL, c'est un pari mal payé — sortie propre à 100&nbsp;%.</div></div></div>
+      <div class="rail"><div class="num">€</div><div><div class="t">Séquençage fiscal (FR)</div><div class="d">Crypto→stablecoin n'est pas un fait générateur&nbsp;: dé-risquer en USDC dans les zones sans déclencher la flat tax, puis étaler la sortie en euros sur plusieurs années fiscales.</div></div></div>
+    </div>
+  </section>
+
+  <section class="col">
+    <h2><span class="n">05</span> Rachat de correction — règle conditionnelle</h2>
+    <p class="sub">Pour une correction <em>pendant</em> le bull (ex. repli après un 160k). Pré-décidé à froid — le « toi » euphorique ou paniqué n'a plus qu'à exécuter.</p>
+    <div class="callout">
+      <span class="k">Défaut</span>
+      <p><strong>NE PAS racheter.</strong> Les bénéfices dorment en stablecoin jusqu'au creux 2030-31. Racheter près du sommet = ré-exposition exacte au round-trip que le plan sert à éviter. Une correction de fin de bull est indiscernable du vrai top en temps réel.</p>
+    </div>
+    <p><strong>Exception</strong> — rachat partiel autorisé <em>seulement si les 3 conditions sont réunies simultanément</em>&nbsp;:</p>
+    <div class="rails">
+      <div class="rail"><div class="num">1</div><div><div class="t">Score composite &lt; 45</div><div class="d">ACCUMULATION / MI-CYCLE = mid-bull. <strong>C'est le régime type-2023</strong> (accumulation) où le dip-buying est favorable — l'opportunité à ne pas rater. Score &gt; 55 = zone de sommet → <strong>interdit</strong> (dip = piège).</div></div></div>
+      <div class="rail"><div class="num">2</div><div><div class="t">Avant la fenêtre de sommet</div><div class="d">Nettement avant halving+18 mois (≈ fin 2029), soit avant ~mi-2029.</div></div></div>
+      <div class="rail"><div class="num">3</div><div><div class="t">Vraie correction</div><div class="d">Prix nettement sous tes rungs (repli marqué), pas un petit -10&nbsp;%.</div></div></div>
+    </div>
+    <div class="callout">
+      <span class="k">Combien &amp; comment</span>
+      <p><strong>Max ⅓</strong> des capitaux issus des <em>seuls rungs déclenchés sous la zone de base</em> (les ventes précoces — ex. 140k/155k pour BTC). Les <strong>≥ ⅔ restants dorment</strong> en dry powder pour le creux 2030-31. Ce que tu rachètes, tu <strong>ré-armes aussitôt les rungs hauts</strong> dessus (182k/192k) pour le re-vendre dans le vrai top. Jamais de all-in&nbsp;: on ne « rachète » que ce qu'on estime avoir vendu <em>trop tôt</em>.</p>
+    </div>
+    <p style="font-size:.86rem;color:var(--ink-soft)"><strong>Note scénario&nbsp;:</strong> un objectif de base (165-185k) touché <em>en avance</em> (ex. 160k dès fin 2028) est un signal de cycle qui tope tôt (« left-translated ») → biais renforcé <em>contre</em> le rachat.</p>
+  </section>
+
+  <section class="col">
+    <h2><span class="n">06</span> À trancher — prochaines étapes</h2>
+    <div class="open">
+      <div class="qitem"><span class="q">BTC&nbsp;: actif de cycle ou épargne long terme&nbsp;?</span> <span class="a">— S'il est une réserve de valeur multi-décennale, un socle intouchable est mis de côté <em>avant</em> le ladder (ce n'est pas un moon bag). Sinon, le tableau à 100&nbsp;% s'applique tel quel.</span></div>
+      <div class="qitem"><span class="q">Plan de re-accumulation 2030–2031.</span> <span class="a">— Corollaire obligatoire d'une sortie totale&nbsp;: définir à froid où racheter dans le prochain bear (ladder inversé), pour ne pas rester spectateur en USDC.</span></div>
+    </div>
+  </section>
+
+  <p class="disc">Cadre théorique et probabiliste à visée analytique — ce ne sont pas des conseils d'investissement personnalisés. Les fourchettes sont des scénarios, pas des prédictions&nbsp;; le marché invalide régulièrement les modèles. Prix de référence&nbsp;: août 2026.</p>
+
+</div>
+</div>
