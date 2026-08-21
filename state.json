@@ -11,19 +11,19 @@
     "date": "2026-08-21"
   },
   "last_Rotation": {
-    "score": 3.3908026679231105,
+    "score": 3.4533762390761744,
     "val": "Dom. BTC 59.4% \u00b7 ETH/BTC 0.0309",
     "date": "2026-08-21"
   },
   "last_Pi Cycle Top": {
-    "score": 15.806589632585405,
+    "score": 15.855744764797217,
     "val": "111DMA / 2\u00d7350DMA = 0.41",
-    "date": "2026-08-20"
+    "date": "2026-08-21"
   },
   "last_Froth": {
-    "score": 33.46153846153846,
-    "val": "Funding 0.010% \u00b7 F&G 62",
-    "date": "2026-08-20"
+    "score": 72.3076923076923,
+    "val": "Fear & Greed 72",
+    "date": "2026-08-21"
   },
   "last_Liquidit\u00e9 globale": {
     "score": 20.0,
@@ -32,5 +32,6 @@
   },
   "last_band_idx": 0,
   "last_band": "ACCUMULATION",
-  "ladder_hits": {}
+  "ladder_hits": {},
+  "pi_ratio": 0.4109902133535805
 }
