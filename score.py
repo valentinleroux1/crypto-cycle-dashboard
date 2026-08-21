@@ -9,7 +9,7 @@ décroissants). Réglés pour la fenêtre 2029.
 
 Usage:  python score.py [chemin_sortie.html]
 """
-import ssl, json, urllib.request, urllib.error, io, csv, sys, os, datetime
+import ssl, json, urllib.request, urllib.error, io, csv, sys, os, datetime, statistics
 
 # --- réseau : TLS vérifié, avec bascule non vérifié si le certificat paraît
 #     expiré/invalide (robuste aux environnements à horloge décalée). ---
@@ -109,20 +109,27 @@ def sig_froth():
     score = clamp((fg - 25) / (90 - 25) * 100)
     return score, f"Fear & Greed {fg}", {"fng": fg}
 
-# 5) Flux ETF — variation hebdo du total BTC en ETF (bitcoin-data.com)
+# 5) Flux ETF — flux hebdo du total BTC en ETF, noté vs sa PROPRE norme récente
+#    (seuil ADAPTATIF : pas de dérive quand l'adoption fait monter la base).
 def sig_etf():
     total = float(get_json("https://bitcoin-data.com/v1/etf-btc-total/last")["etfBtcTotal"])
     prev = state.get("etf_total")
     state["etf_total"] = total
     if prev is None:
-        return 30.0, f"Total ETF {total:,.0f} BTC (1re mesure)", {"etf_total": total}
+        return 45.0, f"Total ETF {total:,.0f} BTC (init)", {}
     delta = total - prev
-    # accumulation (delta>0) = demande présente = FAIBLE risque de sommet ;
-    # distribution (delta<0) au prix haut = risque élevé.
-    pct = delta / prev * 100
-    score = clamp(50 - pct * 40)                     # +1% => 10 ; -1% => 90
+    hist = state.setdefault("etf_hist", [])
+    hist.append(delta)
+    del hist[:-12]                                    # fenêtre glissante ~12 semaines
     sens = "accumulation" if delta >= 0 else "distribution"
-    return score, f"Total ETF {total:,.0f} BTC · {sens} ({pct:+.2f}%/sem)", {"etf_total": total}
+    n = len(hist)
+    if n < 5:
+        return 45.0, f"Flux {sens} · calibrage {n}/5", {}
+    mean = statistics.fmean(hist)
+    sd = statistics.pstdev(hist) or 1.0
+    z = (delta - mean) / sd                           # flux courant vs norme récente
+    score = clamp(45 - z * 22)                        # fort inflow => bas ; outflow/faible => haut
+    return score, f"Flux {sens} vs norme récente (z={z:+.1f})", {"z": z}
 
 # 6) Liquidité M2 — FRED CSV (best-effort, fallback dernière valeur)
 def sig_m2():

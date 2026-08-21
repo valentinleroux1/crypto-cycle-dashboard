@@ -13,7 +13,7 @@ pondéré, et régénère `template.html` → `index.html`.
 |---|---|---|
 | Valorisation (MVRV Z + NUPL) | 25 % | bitcoin-data.com |
 | Liquidité globale (M2 YoY) | 20 % | FRED (CSV) |
-| Flux ETF (delta hebdo) | 20 % | bitcoin-data.com |
+| Flux ETF (adaptatif, vs norme récente) | 20 % | bitcoin-data.com |
 | Rotation (dominance BTC + ETH/BTC) | 15 % | CoinGecko |
 | Pi Cycle Top | 10 % | CoinGecko (historique de prix) |
 | Froth (Fear & Greed) | 10 % | alternative.me |
