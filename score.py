@@ -80,6 +80,7 @@ def sig_pi():
     sma111 = sum(closes[-111:]) / 111
     sma350 = sum(closes[-350:]) / 350
     ratio = sma111 / (2 * sma350)          # =1.0 => croisement (sommet)
+    state["pi_ratio"] = ratio               # exposé pour l'override
     score = clamp((ratio - 0.30) / (1.00 - 0.30) * 100)
     return score, f"111DMA / 2×350DMA = {ratio:.2f}", {"ratio": ratio}
 
@@ -249,6 +250,22 @@ for asset, (cgid, rungs) in LADDERS.items():
                          f"**Action : vendre {pct} de ta ligne {asset}** — cumul **{cum}** sécurisé.\n\n"
                          f"_Alerte automatique — ladder de sortie 2029._"),
             })
+
+# --- OVERRIDE Pi Cycle Top : croisement 111DMA >= 2×350DMA (event, 1 seule fois) ---
+pi_ratio = state.get("pi_ratio")
+if pi_ratio is not None and pi_ratio >= 1.0 and not state.get("pi_cross_alerted"):
+    state["pi_cross_alerted"] = True
+    alerts.append({
+        "title": f"[OVERRIDE] Pi Cycle Top déclenché — sommet historiquement imminent (ratio {pi_ratio:.2f})",
+        "body": ("**Pi Cycle Top vient de se déclencher** : la 111DMA a croisé 2×350DMA "
+                 f"(ratio {pi_ratio:.2f} ≥ 1,0).\n\n"
+                 "Cet indicateur a pointé les sommets **2013 et 2017 à quelques jours près** "
+                 "(⚠️ raté partiel en 2021 : avril vs novembre — cycle distordu par le COVID).\n\n"
+                 "**Action : override → passage forcé en DISTRIBUTION.** Accélérer les ladders / "
+                 "vendre agressivement, quel que soit le score composite.\n\n"
+                 "À croiser avec la confluence (M2, MVRV, funding…) — c'est un signal fort, pas une "
+                 "garantie.\n\n_Alerte override — dashboard sommet de cycle 2029._"),
+    })
 
 with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "alert.json"), "w", encoding="utf-8") as f:
     json.dump({"alerts": alerts}, f, ensure_ascii=False, indent=2)
