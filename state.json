@@ -7,16 +7,16 @@
   "etf_total": 576505.80565048,
   "last_Flux ETF": {
     "score": 45.0,
-    "val": "Flux accumulation \u00b7 calibrage 4/5",
+    "val": "Flux accumulation vs norme r\u00e9cente (z=+0.0)",
     "date": "2026-08-21"
   },
   "last_Rotation": {
-    "score": 2.4810902886369015,
-    "val": "Dom. BTC 59.7% \u00b7 ETH/BTC 0.0308",
+    "score": 2.555704224727192,
+    "val": "Dom. BTC 59.6% \u00b7 ETH/BTC 0.0308",
     "date": "2026-08-21"
   },
   "last_Pi Cycle Top": {
-    "score": 15.85667539199172,
+    "score": 15.856688341511232,
     "val": "111DMA / 2\u00d7350DMA = 0.41",
     "date": "2026-08-21"
   },
@@ -33,8 +33,9 @@
   "last_band_idx": 0,
   "last_band": "ACCUMULATION",
   "ladder_hits": {},
-  "pi_ratio": 0.410996727743942,
+  "pi_ratio": 0.4109968183905786,
   "etf_hist": [
+    0.0,
     0.0,
     0.0,
     0.0,
