@@ -75,8 +75,9 @@ notes = {}
 
 # 1) Pi Cycle Top — Binance klines quotidiennes
 def sig_pi():
-    d = get_json("https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=400")
-    closes = [float(c[4]) for c in d]
+    # CoinGecko (joignable depuis le runner ; Binance y est géo-bloqué)
+    d = get_json("https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=365")
+    closes = [p[1] for p in d["prices"]]
     sma111 = sum(closes[-111:]) / 111
     sma350 = sum(closes[-350:]) / 350
     ratio = sma111 / (2 * sma350)          # =1.0 => croisement (sommet)
@@ -102,13 +103,11 @@ def sig_rot():
     s_eb = clamp((ethbtc - 0.030) / (0.060 - 0.030) * 100)
     return (s_dom + s_eb) / 2, f"Dom. BTC {dom:.1f}% · ETH/BTC {ethbtc:.4f}", {"dom": dom, "ethbtc": ethbtc}
 
-# 4) Froth — funding Binance + Fear & Greed
+# 4) Froth — Fear & Greed (funding Binance abandonné : géo-bloqué sur le runner)
 def sig_froth():
-    fr = float(get_json("https://fapi.binance.com/fapi/v1/premiumIndex?symbol=BTCUSDT")["lastFundingRate"])
     fg = int(get_json("https://api.alternative.me/fng/?limit=1")["data"][0]["value"])
-    s_fund = clamp(fr / 0.0010 * 100)                # funding chaud ~0.10%/8h
-    s_fg = clamp((fg - 25) / (90 - 25) * 100)
-    return (s_fund + s_fg) / 2, f"Funding {fr*100:.3f}% · F&G {fg}", {"funding": fr, "fng": fg}
+    score = clamp((fg - 25) / (90 - 25) * 100)
+    return score, f"Fear & Greed {fg}", {"fng": fg}
 
 # 5) Flux ETF — variation hebdo du total BTC en ETF (bitcoin-data.com)
 def sig_etf():
@@ -143,7 +142,7 @@ SIGNALS = [
     ("Flux ETF",         "la demande",               0.20, sig_etf),
     ("Rotation",         "le régime",                0.15, sig_rot),
     ("Pi Cycle Top",     "le timing",                0.10, sig_pi),
-    ("Froth",            "le sentiment / levier",    0.10, sig_froth),
+    ("Froth",            "le sentiment",             0.10, sig_froth),
 ]
 
 results = []

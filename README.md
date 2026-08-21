@@ -15,8 +15,8 @@ pondéré, et régénère `template.html` → `index.html`.
 | Liquidité globale (M2 YoY) | 20 % | FRED (CSV) |
 | Flux ETF (delta hebdo) | 20 % | bitcoin-data.com |
 | Rotation (dominance BTC + ETH/BTC) | 15 % | CoinGecko |
-| Pi Cycle Top | 10 % | Binance (klines) |
-| Froth (funding + Fear & Greed) | 10 % | Binance + alternative.me |
+| Pi Cycle Top | 10 % | CoinGecko (historique de prix) |
+| Froth (Fear & Greed) | 10 % | alternative.me |
 
 **Score → action** : 0-30 accumulation · 30-50 mi-cycle · 50-70 vigilance (armer les ordres) ·
 70-85 distribution (accélérer les ladders) · 85-100 sommet (backstop, tout vendre).
