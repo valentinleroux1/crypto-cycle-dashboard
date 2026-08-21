@@ -49,6 +49,7 @@ jobs:
           if [ "$COUNT" -gt 0 ]; then
             for i in $(seq 0 $((COUNT-1))); do
               jq -r ".alerts[$i].body" alert.json > _body.md
+              printf '\n\n---\ncc @valentinleroux1\n' >> _body.md   # mention = push mobile
               gh issue create --title "$(jq -r ".alerts[$i].title" alert.json)" --body-file _body.md --assignee valentinleroux1
             done
             echo "$COUNT alerte(s) — issue(s) créée(s), email(s) envoyé(s)."
@@ -64,7 +65,8 @@ jobs:
           printf '%s\n' \
             'Test du systeme alerte, cree par le bot GitHub Actions (exactement comme les vraies alertes de palier).' '' \
             'Si tu recois cette notification (push mobile + email), la chaine fonctionne de bout en bout. 🎉' '' \
-            'Tu peux refermer cette issue.' > _test_body.md
+            'Tu peux refermer cette issue.' '' \
+            'cc @valentinleroux1' > _test_body.md
           gh issue create --title "[TEST] Verification des notifications" --body-file _test_body.md --assignee valentinleroux1
           echo "Issue de test creee."
 
