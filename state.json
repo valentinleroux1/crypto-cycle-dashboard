@@ -1,39 +1,39 @@
 {
   "last_Valorisation": {
-    "score": 31.32933333333333,
-    "val": "MVRV Z 0.91 \u00b7 NUPL 0.33",
-    "date": "2026-09-14"
+    "score": 29.65766666666667,
+    "val": "MVRV Z 0.79 \u00b7 NUPL 0.33",
+    "date": "2026-09-21"
   },
-  "etf_total": 614343.36003189,
+  "etf_total": 604501.89385188,
   "last_Flux ETF": {
-    "score": 57.60890509220545,
-    "val": "Flux distribution vs norme r\u00e9cente (z=-0.6)",
-    "date": "2026-09-14"
+    "score": 83.54855610022489,
+    "val": "Flux distribution vs norme r\u00e9cente (z=-1.8)",
+    "date": "2026-09-21"
   },
   "last_Rotation": {
-    "score": 8.100699311789356,
-    "val": "Dom. BTC 58.6% \u00b7 ETH/BTC 0.0320",
-    "date": "2026-09-14"
+    "score": 6.922964466131495,
+    "val": "Dom. BTC 58.9% \u00b7 ETH/BTC 0.0320",
+    "date": "2026-09-21"
   },
   "last_Pi Cycle Top": {
-    "score": 17.559296414411374,
-    "val": "111DMA / 2\u00d7350DMA = 0.42",
-    "date": "2026-09-14"
+    "score": 18.597481768908672,
+    "val": "111DMA / 2\u00d7350DMA = 0.43",
+    "date": "2026-09-21"
   },
   "last_Froth": {
-    "score": 49.23076923076923,
-    "val": "Fear & Greed 57",
-    "date": "2026-09-14"
+    "score": 69.23076923076923,
+    "val": "Fear & Greed 70",
+    "date": "2026-09-21"
   },
   "last_Liquidit\u00e9 globale": {
     "score": 20.0,
     "val": "M2 YoY +5,0% (23,2 T$)",
     "date": "2026-08-20"
   },
-  "last_band_idx": 0,
-  "last_band": "ACCUMULATION",
+  "last_band_idx": 1,
+  "last_band": "MI-CYCLE",
   "ladder_hits": {},
-  "pi_ratio": 0.4229150749008796,
+  "pi_ratio": 0.4301823723823607,
   "etf_hist": [
     0.0,
     0.0,
@@ -45,6 +45,7 @@
     15335.316640460049,
     16651.768974869978,
     5942.097427819972,
-    -91.62866173998918
+    -91.62866173998918,
+    -9841.46618001
   ]
 }
