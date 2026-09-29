@@ -31,8 +31,8 @@ def _fetch(req, timeout):
             return urllib.request.urlopen(req, timeout=timeout, context=_unverified_ctx()).read()
         raise
 
-def _open(url, timeout, accept=None, attempts=3):
-    h = {"User-Agent": "Mozilla/5.0"}
+def _open(url, timeout, accept=None, attempts=3, ua="Mozilla/5.0"):
+    h = {"User-Agent": ua}
     if accept:
         h["Accept"] = accept
     req = urllib.request.Request(url, headers=h)
@@ -49,8 +49,8 @@ def _open(url, timeout, accept=None, attempts=3):
 def get_json(url, timeout=25, attempts=3):
     return json.loads(_open(url, timeout, accept="application/json", attempts=attempts))
 
-def get_text(url, timeout=15, attempts=1):
-    return _open(url, timeout, attempts=attempts).decode()
+def get_text(url, timeout=15, attempts=1, ua="Mozilla/5.0"):
+    return _open(url, timeout, attempts=attempts, ua=ua).decode()
 
 # --- état persistant (dernières valeurs connues + total ETF précédent) ---
 STATE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "state.json")
@@ -133,9 +133,17 @@ def sig_etf():
 
 # 6) Liquidité M2 — FRED CSV (best-effort, fallback dernière valeur)
 def sig_m2():
-    raw = get_text("https://fred.stlouisfed.org/graph/fredgraph.csv?id=M2SL", timeout=45)
-    rows = [r for r in csv.reader(io.StringIO(raw)) if r and r[0] != "DATE"]
-    m2, m2y = float(rows[-1][1]), float(rows[-13][1])
+    # FRED (Akamai) laisse pendre les UA « navigateur » incomplets -> UA de script explicite
+    raw = get_text("https://fred.stlouisfed.org/graph/fredgraph.csv?id=M2SL", timeout=30,
+                   attempts=3, ua="crypto-cycle-dashboard/1.0 (python-urllib)")
+    # en-tête "DATE" ou "observation_date" selon l'époque ; on ne garde que les lignes chiffrées
+    rows = []
+    for r in csv.reader(io.StringIO(raw)):
+        try:
+            rows.append((r[0], float(r[1])))
+        except (IndexError, ValueError):
+            pass
+    m2, m2y = rows[-1][1], rows[-13][1]
     yoy = (m2 / m2y - 1) * 100
     state["m2_yoy"] = yoy
     # expansion forte = carburant présent = risque bas ; contraction = risque haut
