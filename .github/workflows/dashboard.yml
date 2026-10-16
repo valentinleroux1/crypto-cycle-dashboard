@@ -23,6 +23,7 @@ concurrency:
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 20        # filet de sécurité (le run du 05/10 a pendu 15 min)
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
@@ -36,6 +37,9 @@ jobs:
       - run: pip install certifi
 
       - name: Calcul du score composite
+        timeout-minutes: 10
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}   # optionnel : source M2 fiable
         run: |
           mkdir -p public
           python score.py public/index.html
