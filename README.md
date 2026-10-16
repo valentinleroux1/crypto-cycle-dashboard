@@ -12,7 +12,7 @@ pondéré, et régénère `template.html` → `index.html`.
 | Signal | Poids | Source |
 |---|---|---|
 | Valorisation (MVRV Z + NUPL) | 25 % | bitcoin-data.com |
-| Liquidité globale (M2 YoY) | 20 % | FRED (CSV) |
+| Liquidité globale (M2 YoY) | 20 % | FRED (API si secret `FRED_API_KEY`, sinon CSV) |
 | Flux ETF (adaptatif, vs norme récente) | 20 % | bitcoin-data.com |
 | Rotation (dominance BTC + ETH/BTC) | 15 % | CoinGecko |
 | Pi Cycle Top | 10 % | CoinGecko (historique de prix) |
@@ -21,7 +21,9 @@ pondéré, et régénère `template.html` → `index.html`.
 **Score → action** : 0-30 accumulation · 30-50 mi-cycle · 50-70 vigilance (armer les ordres) ·
 70-85 distribution (accélérer les ladders) · 85-100 sommet (backstop, tout vendre).
 
-Un signal indisponible retombe sur sa dernière valeur connue (`state.json`).
+Un signal indisponible retombe sur sa dernière valeur connue (`state.json`), affichée avec sa date.
+Au-delà de 21 j (45 j pour M2) elle est **exclue du score** et les poids restants sont renormalisés.
+Chaque signal a un délai dur de 120 s : une source qui pend ne bloque plus le workflow.
 
 ## Installation (une fois, ~10 min)
 
