@@ -114,11 +114,16 @@ def sig_froth():
 def sig_etf():
     total = float(get_json("https://bitcoin-data.com/v1/etf-btc-total/last")["etfBtcTotal"])
     prev = state.get("etf_total")
-    state["etf_total"] = total
+    hist = [h for h in state.setdefault("etf_hist", []) if h != 0.0]   # purge des deltas nuls parasites
+    state["etf_hist"] = hist
+    last_d = state.get("etf_date") or state.get("last_Flux ETF", {}).get("date")
     if prev is None:
+        state["etf_total"], state["etf_date"] = total, TODAY_ISO
         return 45.0, f"Total ETF {total:,.0f} BTC (init)", {}
+    if last_d and (datetime.date.today() - datetime.date.fromisoformat(last_d)).days < 5:
+        raise RuntimeError("relance < 5 j : delta ETF non hebdo, on garde la valeur de la semaine")
     delta = total - prev
-    hist = state.setdefault("etf_hist", [])
+    state["etf_total"], state["etf_date"] = total, TODAY_ISO
     hist.append(delta)
     del hist[:-12]                                    # fenêtre glissante ~12 semaines
     sens = "accumulation" if delta >= 0 else "distribution"
@@ -131,24 +136,50 @@ def sig_etf():
     score = clamp(45 - z * 22)                        # fort inflow => bas ; outflow/faible => haut
     return score, f"Flux {sens} vs norme récente (z={z:+.1f})", {"z": z}
 
-# 6) Liquidité M2 — FRED CSV (best-effort, fallback dernière valeur)
-def sig_m2():
-    # FRED (Akamai) laisse pendre les UA « navigateur » incomplets -> UA de script explicite
-    raw = get_text("https://fred.stlouisfed.org/graph/fredgraph.csv?id=M2SL", timeout=30,
-                   attempts=3, ua="crypto-cycle-dashboard/1.0 (python-urllib)")
-    # en-tête "DATE" ou "observation_date" selon l'époque ; on ne garde que les lignes chiffrées
+# 6) Liquidité M2 — plusieurs sources, la première qui répond gagne.
+#    Le CSV fredgraph n'a jamais répondu depuis les runners GitHub (Akamai) :
+#    l'API officielle FRED (clé gratuite, secret FRED_API_KEY) passe en premier si dispo.
+MOIS = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."]
+def _m2_fred_api():
+    key = os.environ.get("FRED_API_KEY", "").strip()
+    if not key:
+        raise RuntimeError("pas de FRED_API_KEY")
+    d = get_json("https://api.stlouisfed.org/fred/series/observations?series_id=M2SL"
+                 f"&api_key={key}&file_type=json&sort_order=desc&limit=13", timeout=20, attempts=2)
+    obs = [(o["date"], float(o["value"])) for o in d["observations"] if o["value"] not in (".", "")]
+    return list(reversed(obs))
+def _m2_fred_csv():
+    raw = get_text("https://fred.stlouisfed.org/graph/fredgraph.csv?id=M2SL", timeout=20,
+                   attempts=2, ua="crypto-cycle-dashboard/1.0 (python-urllib)")
     rows = []
     for r in csv.reader(io.StringIO(raw)):
         try:
             rows.append((r[0], float(r[1])))
         except (IndexError, ValueError):
             pass
-    m2, m2y = rows[-1][1], rows[-13][1]
+    return rows
+M2_SOURCES = [("FRED API", _m2_fred_api), ("FRED CSV", _m2_fred_csv)]
+
+def sig_m2():
+    errs = []
+    for label, fn in M2_SOURCES:
+        try:
+            rows = fn()
+            if len(rows) < 13:
+                raise RuntimeError(f"{len(rows)} lignes")
+            break
+        except Exception as e:
+            errs.append(f"{label}: {e!r}"[:120])
+    else:
+        raise RuntimeError(" | ".join(errs))
+    print(f"  M2 via {label}" + (f" (après échecs : {errs})" if errs else ""))
+    (d_last, m2), m2y = rows[-1], rows[-13][1]
     yoy = (m2 / m2y - 1) * 100
     state["m2_yoy"] = yoy
+    y, mo = int(d_last[:4]), int(d_last[5:7])
     # expansion forte = carburant présent = risque bas ; contraction = risque haut
     score = clamp(50 - yoy * 6)                       # +5% YoY => 20 ; -3% => 68
-    return score, f"M2 YoY {yoy:+.1f}%", {"m2_yoy": yoy}
+    return score, f"M2 YoY {yoy:+.1f}% ({MOIS[mo-1]} {y})", {"m2_yoy": yoy}
 
 # poids (somme = 1.0)
 SIGNALS = [
@@ -160,26 +191,60 @@ SIGNALS = [
     ("Froth",            "le sentiment",             0.10, sig_froth),
 ]
 
+# Délai DUR par signal : un serveur qui « laisse pendre » la connexion (cas du run du
+# 05/10/2026, tué après 15 min) ne peut plus bloquer tout le workflow.
+import threading
+SIGNAL_DEADLINE = 120                     # secondes, toutes tentatives comprises
+# Au-delà de cet âge, une valeur de repli n'est plus de l'information : le signal sort
+# du score et les poids des autres sont renormalisés.
+MAX_AGE_DAYS = {"Liquidité globale": 45}  # M2 mensuel : 45 j sans succès = au moins une publication ratée
+MAX_AGE_DEFAULT = 21
+
+def run_with_deadline(fn, seconds):
+    box = {}
+    def target():
+        try:
+            box["res"] = fn()
+        except Exception as e:
+            box["err"] = e
+    t = threading.Thread(target=target, daemon=True)
+    t.start()
+    t.join(seconds)
+    if t.is_alive():
+        raise TimeoutError(f"délai dur de {seconds}s dépassé")
+    if "err" in box:
+        raise box["err"]
+    return box["res"]
+
 results = []
 for name, q, w, fn in SIGNALS:
     key = "last_" + name
+    excluded = False
     try:
-        score, val, _ = fn()
+        score, val, _ = run_with_deadline(fn, SIGNAL_DEADLINE)
         state[key] = {"score": score, "val": val, "date": TODAY_ISO}
         stale = False
     except Exception as e:
         cached = state.get(key)
         if cached:
             score = cached["score"]
-            same_day = cached.get("date") == TODAY_ISO
-            val = cached["val"] if same_day else cached["val"] + f" (valeur du {cached.get('date','?')})"
-            stale = not same_day
+            cdate = cached.get("date", "1970-01-01")
+            age = (datetime.date.today() - datetime.date.fromisoformat(cdate)).days
+            excluded = age > MAX_AGE_DAYS.get(name, MAX_AGE_DEFAULT)
+            stale = age > 0
+            val = cached["val"] if not stale else cached["val"] + f" (valeur du {cdate}" + (" — exclu du score)" if excluded else ")")
         else:
-            score, val, stale = 40.0, "indisponible", True
-        notes[name] = repr(e)[:80]
-    results.append({"name": name, "q": q, "w": w, "score": score, "val": val, "stale": stale})
+            score, val, stale, excluded = 40.0, "indisponible — exclu du score", True, True
+        notes[name] = repr(e)[:160]
+    results.append({"name": name, "q": q, "w": w, "score": score, "val": val,
+                    "stale": stale, "excluded": excluded})
 
-composite = round(sum(r["score"] * r["w"] for r in results))
+# renormalisation des poids sur les signaux retenus
+w_kept = sum(r["w"] for r in results if not r["excluded"]) or 1.0
+for r in results:
+    r["w_eff"] = 0.0 if r["excluded"] else r["w"] / w_kept
+
+composite = round(sum(r["score"] * r["w_eff"] for r in results))
 
 # ======================= RENDU HTML =======================
 def band(s):
@@ -291,7 +356,7 @@ for r in results:
       <div class="chead"><div><div class="nm">{r['name']}</div><div class="q">{r['q']}</div></div><span class="pill">{pill}</span></div>
       <div class="val">{r['val']}</div>
       <div class="sbar"><div class="f" style="width:{r['score']:.0f}%"></div></div>
-      <div class="foot"><span>sous-score <b>{r['score']:.0f}</b>/100</span><span>poids {r['w']*100:.0f} %</span></div>
+      <div class="foot"><span>sous-score <b>{r['score']:.0f}</b>/100</span><span>{"exclu (donnée périmée)" if r["excluded"] else f"poids {r['w_eff']*100:.0f} %"}</span></div>
     </div>
 """
 
@@ -313,7 +378,8 @@ save_state(state)
 print(f"Score composite : {composite}/100  ({vlab})")
 for r in results:
     flag = "  [STALE]" if r["stale"] else ""
-    print(f"  {r['name']:<18} {r['score']:5.1f}  x{r['w']:.2f}   {r['val']}{flag}")
+    flag += "  [EXCLU]" if r["excluded"] else ""
+    print(f"  {r['name']:<18} {r['score']:5.1f}  x{r['w_eff']:.2f}   {r['val']}{flag}")
 if notes:
     print("Signaux en fallback :", notes)
 print(f"Palier score : {PALIERS[cur_idx]}" + (f"  <<< FRANCHISSEMENT {arrow}" if changed else "  (inchangé)"))
